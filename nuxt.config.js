@@ -30,6 +30,8 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    '~/plugins/v-toastr',
+
   ],
   /*
   ** Nuxt.js dev-modules
