@@ -89,5 +89,5 @@ sw.*
 # Vim swap files
 *.swp
 api/jwt-secret.php
-
+api/database.php
 vendor/
