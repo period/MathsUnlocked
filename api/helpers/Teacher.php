@@ -1,6 +1,7 @@
 <?php
     class Teacher {
         private $id = null;
+        private $school = null;
         private $username = null;
         private $email = null;
         private $hash = null;
@@ -14,28 +15,28 @@
         }
 
         public function export() {
-            return ["id" => $this->getId(), "username" => $this->getUsername(), "email" => $this->getEmail(), "name" => $this->getName()];
+            return ["id" => $this->getId(), "username" => $this->getUsername(), "email" => $this->getEmail(), "school" => $this->getSchool(), "name" => $this->getName()];
         }
 
         public function load($conn) {
-            $stmt = $conn->prepare("SELECT id, username, email, hash, name FROM teachers WHERE username = ?;");
+            $stmt = $conn->prepare("SELECT id, school, username, email, hash, name FROM teachers WHERE username = ?;");
             $stmt->bind_param("s", $this->username);
             $stmt->execute();
-            $stmt->bind_result($this->id, $this->username, $this->email, $this->hash, $this->name);
+            $stmt->bind_result($this->id, $this->school, $this->username, $this->email, $this->hash, $this->name);
             $stmt->fetch();
             $stmt->close();
             return true;
         }
         public function save($conn) {
-            $stmt = $conn->prepare("UPDATE students SET username = ?, email = ?, hash = ?, name = ? WHERE id = ?;");
-            $stmt->bind_param("ssssi", $this->username, $this->email, $this->hash, $this->name, $this->id);
+            $stmt = $conn->prepare("UPDATE teachers SET school = ?, username = ?, email = ?, hash = ?, name = ? WHERE id = ?;");
+            $stmt->bind_param("issssi", $this->school, $this->username, $this->email, $this->hash, $this->name, $this->id);
             $stmt->execute();
             $stmt->close();
             return true;
         }
         public function create($conn) {
-            $stmt = $conn->prepare("INSERT INTO students VALUES (null, ?, ?, ?, ?);");
-            $stmt->bind_param("ssss", $this->username, $this->email, $this->hash, $this->name);
+            $stmt = $conn->prepare("INSERT INTO teachers VALUES (null, ?, ?, ?, ?, ?);");
+            $stmt->bind_param("issss", $this->school, $this->username, $this->email, $this->hash, $this->name);
             $res = $stmt->execute();
             $this->id = $stmt->insert_id;
             $stmt->close();
@@ -47,6 +48,12 @@
         }
         public function setId($id) {
             $this->id = $id;
+        }
+        public function getSchool() {
+            return $this->school;
+        }
+        public function setSchool($school) {
+            $this->school = $school;
         }
         public function getUsername() {
             return $this->username;
