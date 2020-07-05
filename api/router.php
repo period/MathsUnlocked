@@ -52,8 +52,6 @@
 
     require_once("database.php");
 
-    var_dump($request);
-
     if($request["sliced"][1] == "auth") {
         require_once("routes/auth.php");
     }
