@@ -38,7 +38,7 @@
                 <div class="mt-3">
                     <b-btn-group>
                         <b-button v-if="importMethod != null"variant="primary" :disabled="disableCreateBtn()" @click="create()"><span v-if="importMethod == 'manual'">Create student</span><span v-else :disabled="this.csvFile == null" @click="csvImport()">Import students</span></b-button>
-                        <b-button variant="secondary" @click="$nuxt.$router.push('/setup/students')">Next Step</b-button>
+                        <b-button variant="secondary" @click="$nuxt.$router.push('/setup/classes')">Next Step</b-button>
                     </b-btn-group>
                 </div>
             </b-card-body>
@@ -52,7 +52,7 @@
 <script>
 
 export default {
-    name: "SetupTeachers",
+    name: "SetupStudents",
     components: {
     },
     data() {
@@ -87,18 +87,14 @@ export default {
         },
         async create() {
             this.activeRequest = true;
-            await this.$axios.$put("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/teachers", [{name: this.name, username: this.username, email: this.email, password: this.password}], {
+            await this.$axios.$put("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/students", this.studentsToImport, {
                 headers: {}
             })
             .then((res) => {
                 this.activeRequest = false;
-                this.name = null;
-                this.email = null;
-                this.username = null;
-                this.password = null;
                 this.$toastr(
                     "success",
-                    "Teacher account created successfully",
+                    "Student account(s) created successfully",
                     "Creation successful"
                 );
             })
