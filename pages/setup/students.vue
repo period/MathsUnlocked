@@ -26,6 +26,7 @@
                     <b-input-group class="mt-3">
                         <b-form-input id="email" placeholder="Email address" type="email" v-model="email" />
                     </b-input-group>
+                    <b-button :disabled="disableAddBtn()" variant="primary" @click="add()">Add</b-button>
                 </div>
                 <div v-if="importMethod == 'csv'">
                     <strong>Select a CSV file:</strong>
@@ -34,10 +35,16 @@
                     <p>Usernames and passwords will be generated at random</p>
                     <b-form-file accept=".csv" v-model="csvFile" :state="Boolean(csvFile)" placeholder="Select a file" drop-placeholder="Drag and drop a file" />
                     <p>{{ importStatus }}</p>
+                    <b-button v-if="Boolean(csvFile)" variant="primary" @click="csvImport()">Load CSV file</b-button>
+                </div>
+                <hr>
+                <div class="mt-3">
+                    <strong>Students to be imported ({{this.studentsToImport.length}}):</strong>
+                    <b-table responsive striped bordered :items="this.studentsToImport"></b-table>
                 </div>
                 <div class="mt-3">
                     <b-btn-group>
-                        <b-button v-if="importMethod != null"variant="primary" :disabled="disableCreateBtn()" @click="create()"><span v-if="importMethod == 'manual'">Create student</span><span v-else :disabled="this.csvFile == null" @click="csvImport()">Import students</span></b-button>
+                        <b-button v-if="importMethod != null" variant="primary" :disabled="this.studentsToImport == 0" @click="create()">Import Students</b-button>
                         <b-button variant="secondary" @click="$nuxt.$router.push('/setup/classes')">Next Step</b-button>
                     </b-btn-group>
                 </div>
@@ -72,7 +79,6 @@ export default {
         async csvImport() {
             let reader = new FileReader();
             reader.onload = e => {
-                this.studentsToImport = [];
                 let lines = e.target.result.split(/\r?\n/);
                 for(var i = 0; i < lines.length; i++) {
                     if(lines[i].includes(",") == false) continue;
@@ -102,11 +108,13 @@ export default {
                 this.activeRequest = false;
             })
         },
-        disableCreateBtn() {
+        add() {
+            if(this.disableAddBtn() == true) return;
+            this.studentsToImport.push({name: this.name, email: this.email})
+        },
+        disableAddBtn() {
             if(this.name == null || this.name.length < 5 || this.name.trim().includes(" ") == false) return true;
             if(this.email == null || this.email.length < 5 || this.email.includes("@") == false || this.email.includes(".") == false) return true;
-            if(this.username == null || this.username.length < 3) return true;
-            if(this.password == null || this.password.length < 3) return true;
             if(this.activeRequest == true) return true;
             return false;
         }
