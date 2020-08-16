@@ -85,6 +85,7 @@ export default {
                     let data = lines[i].split(",");
                     if(data[1].includes("@") == false || data[1].includes(".") == false) continue;
                     if(data[0].includes(" ") == false) continue;
+                    if(this.isEmailInBuffer(data[1])) continue;
                     this.studentsToImport.push({name: data[0], email: data[1]})
                 }
                 this.importStatus = "Found " + this.studentsToImport.length + " students for import. Please verify that the data is correct before importing.";
@@ -108,8 +109,13 @@ export default {
                 this.activeRequest = false;
             })
         },
+        isEmailInBuffer(email) {
+            for(var i = 0; i < this.studentsToImport.length; i++) if(this.studentsToImport[i].email.toLowerCase() == email.toLowerCase()) return true;
+            return false;
+        },
         add() {
             if(this.disableAddBtn() == true) return;
+            if(this.isEmailInBuffer(this.email)) return;
             this.studentsToImport.push({name: this.name, email: this.email})
         },
         disableAddBtn() {
