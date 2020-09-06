@@ -19,8 +19,8 @@
         }
 
         public function load($conn) {
-            $stmt = $conn->prepare("SELECT id, school, username, email, hash, name FROM students WHERE username = ?;");
-            $stmt->bind_param("s", $this->username);
+            $stmt = $conn->prepare("SELECT id, school, username, email, hash, name FROM students WHERE id = ?;");
+            $stmt->bind_param("s", $this->id);
             $stmt->execute();
             $stmt->bind_result($this->id, $this->school, $this->username, $this->email, $this->hash, $this->name);
             $stmt->fetch();
