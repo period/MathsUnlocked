@@ -95,9 +95,10 @@ export default {
         async create() {
             this.activeRequest = true;
             await this.$axios.$put("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/students", this.studentsToImport, {
-                headers: {}
+                headers: {"Authorization": localStorage.getItem("authorization")}
             })
             .then((res) => {
+                this.studentsToImport = [];
                 this.activeRequest = false;
                 this.$toastr(
                     "success",

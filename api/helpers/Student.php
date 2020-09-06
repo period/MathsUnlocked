@@ -7,8 +7,8 @@
         private $hash = null;
         private $name = null;
 
-        public function __construct($userName, $data=array()) {
-            $this->username = $userName;
+        public function __construct($uid, $data=array()) {
+            $this->id = $uid;
             foreach($data as $key => $value) {
                 $this->$key = $value;
             }

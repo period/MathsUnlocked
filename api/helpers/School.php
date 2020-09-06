@@ -1,5 +1,5 @@
 <?php
-    class SchoolClass {
+    class School {
         private $id = null;
         private $name = null;
         private $owner = null;
@@ -33,7 +33,7 @@
         }
         public function create($conn) {
             $stmt = $conn->prepare("INSERT INTO schools VALUES (null, ?, ?);");
-            $stmt->bind_param("ss",  $this->name, $this->owner);
+            $stmt->bind_param("si",  $this->name, $this->owner);
             $res = $stmt->execute();
             $this->id = $stmt->insert_id;
             $stmt->close();

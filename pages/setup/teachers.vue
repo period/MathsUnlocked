@@ -60,7 +60,7 @@ export default {
         async create() {
             this.activeRequest = true;
             await this.$axios.$put("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/teachers", {name: this.name, username: this.username, email: this.email, password: this.password}, {
-                headers: {}
+                headers: {"Authorization": localStorage.getItem("authorization")}
             })
             .then((res) => {
                 this.activeRequest = false;

@@ -7,8 +7,8 @@
         private $hash = null;
         private $name = null;
 
-        public function __construct($userName, $data=array()) {
-            $this->username = $userName;
+        public function __construct($uid, $data=array()) {
+            $this->id = $uid;
             foreach($data as $key => $value) {
                 $this->$key = $value;
             }
@@ -19,8 +19,8 @@
         }
 
         public function load($conn) {
-            $stmt = $conn->prepare("SELECT id, school, username, email, hash, name FROM teachers WHERE username = ?;");
-            $stmt->bind_param("s", $this->username);
+            $stmt = $conn->prepare("SELECT id, school, username, email, hash, name FROM teachers WHERE id = ?;");
+            $stmt->bind_param("i", $this->id);
             $stmt->execute();
             $stmt->bind_result($this->id, $this->school, $this->username, $this->email, $this->hash, $this->name);
             $stmt->fetch();

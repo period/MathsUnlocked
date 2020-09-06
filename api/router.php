@@ -20,6 +20,9 @@
                 else if($validator == "string") {
                     if(empty($key) || !is_string($key) && !is_numeric($key)) renderError("Expecting string but got something else for " . $key);
                 }
+                else if($validator == "name") {
+                    if(!(strpos(trim($key), " ") !== false)) renderError("Invalid full name");
+                }
                 else if($validator == "alnum") {
                     if(!ctype_alnum($key)) renderError("Field must be alphanumeric");
                 }
@@ -34,6 +37,9 @@
                 }
                 else if($validator == "email") {
                     if(!filter_var($key, FILTER_VALIDATE_EMAIL)) renderError("Invalid email");
+                }
+                else if($validator == "array") {
+                    if(!is_array($key)) renderError("Expecting array");
                 }
                 else renderError("Unknown validation check (" .$validator.")");
             }
@@ -54,6 +60,9 @@
 
     if($request["sliced"][1] == "auth") {
         require_once("routes/auth.php");
+    }
+    else if($request["sliced"][1] == "school") {
+        require_once("routes/school.php");
     }
 
     renderError("Unable to route request", 404);

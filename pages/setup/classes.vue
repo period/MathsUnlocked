@@ -70,7 +70,7 @@ export default {
             this.activeRequest = true;
             this.classes = Array.from(new Set(this.classes)); // deduplicate array
             await this.$axios.$put("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/classes", this.classes, {
-                headers: {}
+                headers: {"Authorization": localStorage.getItem("authorization")}
             })
             .then((res) => {
                 this.activeRequest = false;
