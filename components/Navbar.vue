@@ -7,13 +7,26 @@
       <b-navbar-nav>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-button to="/login">Login</b-button>
+        <b-button to="/login" v-if="!isLoggedIn()">Login</b-button>
+        <b-button @click="logout()" v-else>Logout</b-button>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
 </template>
 <script>
 export default {
-  name: "Navbar"
+  name: "Navbar",
+  methods: {
+    isLoggedIn() {
+      let token = localStorage.getItem("authorization");
+      if(token == null) return false;
+      if(JSON.parse(atob(token.split(".")[1])).exp < (new Date().getTime()/1000)) return false;
+      return true;
+    },
+    logout() {
+      localStorage.removeItem("authorization");
+      $nuxt.$router.push("/");
+    }
+  }
 };
 </script>
