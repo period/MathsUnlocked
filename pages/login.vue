@@ -57,12 +57,13 @@ export default {
             })
             .then((res) => {
                 this.activeRequest = false;
+                localStorage.setItem("authorization", res.token);
                     this.$toastr(
                     "success",
                     "You will be redirected momentarily",
                     "Login successful"
                     );
-                    $nuxt.$router.push('/dashboard' + this.userType.toLowerCase())
+                    $nuxt.$router.push('/dashboard/' + this.userType.toLowerCase())
             })
             .catch((e) => {
                 this.activeRequest = false;
