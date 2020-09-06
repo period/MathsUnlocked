@@ -58,6 +58,7 @@ export default {
             .then((res) => {
                 this.activeRequest = false;
                 localStorage.setItem("authorization", res.token);
+                localStorage.setItem("userid", JSON.parse(atob(res.token.split(".")[1])).user_id);
                     this.$toastr(
                     "success",
                     "You will be redirected momentarily",
