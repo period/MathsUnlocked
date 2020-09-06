@@ -62,7 +62,7 @@ export default {
                     "You will be redirected momentarily",
                     "Login successful"
                     );
-                    $nuxt.$router.push('/dashboard')
+                    $nuxt.$router.push('/dashboard' + this.userType.toLowerCase())
             })
             .catch((e) => {
                 this.activeRequest = false;
