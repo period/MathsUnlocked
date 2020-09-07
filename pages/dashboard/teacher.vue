@@ -5,7 +5,7 @@
             <h1 class="text-center">Hello, {{ name }}</h1>
             <b-card title="Your Students">
                 <p v-if="this.students.length == 0">You have no students in your classes</p>
-                <b-list-group v-else v-for="student in this.students">
+                <b-list-group v-else v-for="student in this.students" :key="student.id">
                     <teacher-student-item :student="student" />
                 </b-list-group>
                 <n-link :to="getStudentsURL()"><small>Looking for all students in the school?</small></n-link>
@@ -17,7 +17,7 @@
             </b-card>
         </b-col>
         <b-col lg="3">
-            <b-button squared block>Edit Profile</b-button>
+            <n-link to="./edit-profile"><b-button squared block>Edit Profile</b-button></n-link>
         </b-col>
     </b-row>
   </div>

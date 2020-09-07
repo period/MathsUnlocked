@@ -25,21 +25,25 @@
                 <b-input-group class="mt-3">
                     <b-form-input id="password" placeholder="Password" type="password" v-model="password" />
                 </b-input-group>
-                <div class="mt-3"><b-button variant="primary" :disabled="disableLoginBtn()" @click="login()">Login</b-button></div>
+                <div class="mt-3"><b-button variant="primary" v-b-modal="'qrlogin'">QR Code</b-button> <b-button variant="primary" :disabled="disableLoginBtn()" @click="login()">Login</b-button></div>
                 <div class="mt-2"><n-link to="/password-reset">Forgot your password?</n-link></div>
             </b-card-body>
             </b-card>
         </b-col>
         <b-col lg="3" />
     </b-row>
+    <b-modal title="QR Code Login" id="qrlogin">
+        <qrcode-stream @decode="loginQR"></qrcode-stream>
+    </b-modal>
   </div>
 </template>
 
 <script>
-
+import { QrcodeStream } from 'vue-qrcode-reader';
 export default {
     name: "Login",
     components: {
+        QrcodeStream
     },
     data() {
         return {
@@ -50,21 +54,36 @@ export default {
         }
     },
     methods: {
+        handleLoginResponse(res) {
+            this.activeRequest = false;
+            localStorage.setItem("authorization", res.token);
+            localStorage.setItem("userid", JSON.parse(atob(res.token.split(".")[1])).user_id);
+            this.$toastr(
+                "success",
+                "You will be redirected momentarily",
+                "Login successful"
+            );
+            $nuxt.$router.push('/dashboard/' + this.userType.toLowerCase())
+        },
+        async loginQR(jwt) {
+            this.activeRequest = true;
+            await this.$axios.$post("https://mathsunlockedapi.thomas.gg/auth/qr", {use_qr: true, qr: jwt}, {
+                headers: {}
+            })
+            .then((res) => {
+                this.handleLoginResponse(res);
+            })
+            .catch((e) => {
+                this.activeRequest = false;
+            })
+        },
         async login() {
             this.activeRequest = true;
             await this.$axios.$post("https://mathsunlockedapi.thomas.gg/auth/" + this.username, {type: this.userType.toLowerCase(), password: this.password}, {
                 headers: {}
             })
             .then((res) => {
-                this.activeRequest = false;
-                localStorage.setItem("authorization", res.token);
-                localStorage.setItem("userid", JSON.parse(atob(res.token.split(".")[1])).user_id);
-                    this.$toastr(
-                    "success",
-                    "You will be redirected momentarily",
-                    "Login successful"
-                    );
-                    $nuxt.$router.push('/dashboard/' + this.userType.toLowerCase())
+                this.handleLoginResponse(res);
             })
             .catch((e) => {
                 this.activeRequest = false;

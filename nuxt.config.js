@@ -1,5 +1,11 @@
-
+import fs from 'fs';
 export default {
+  server: {
+    https: {
+      key: fs.readFileSync("./localhost.key"),
+      cert: fs.readFileSync("./localhost.crt")
+    }
+  },
   /*
   ** Nuxt rendering mode
   ** See https://nuxtjs.org/api/configuration-mode
@@ -31,7 +37,7 @@ export default {
   */
   plugins: [
     '~/plugins/v-toastr',
-
+    '~/plugins/qrcode',
   ],
   /*
   ** Nuxt.js dev-modules

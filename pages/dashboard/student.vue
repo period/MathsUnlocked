@@ -24,7 +24,7 @@
             </b-card>
         </b-col>
         <b-col lg="3">
-            <b-button squared block>Edit Profile</b-button>
+            <n-link to="./edit-profile"><b-button squared block>Edit Profile</b-button></n-link>
             <b-button squared block :disabled="disableLiveMaths()">Live Maths</b-button>
         </b-col>
     </b-row>
