@@ -58,12 +58,13 @@ export default {
             this.activeRequest = false;
             localStorage.setItem("authorization", res.token);
             localStorage.setItem("userid", JSON.parse(atob(res.token.split(".")[1])).user_id);
+            localStorage.setItem("schoolID", res.school);
             this.$toastr(
                 "success",
                 "You will be redirected momentarily",
                 "Login successful"
             );
-            $nuxt.$router.push('/dashboard/' + this.userType.toLowerCase())
+            $nuxt.$router.push('/dashboard/' + JSON.parse(atob(res.token.split(".")[1])).scope)
         },
         async loginQR(jwt) {
             this.activeRequest = true;

@@ -1,0 +1,95 @@
+<template>
+  <div class="container">
+    <b-row class="mt-2">
+        <b-col lg="9">
+            <h1 class="text-center">Hello, {{ name }}</h1>
+            <b-card title="Classes">
+                <p v-if="this.classes.length == 0">Your school has no classes</p>
+                <b-list-group v-else v-for="schoolclass in this.classes" :key="schoolclass.id">
+                    <teacher-class-item :schoolclass="schoolclass" />
+                </b-list-group>
+                <b-button variant="primary" class="mt-2" v-b-modal="'createclass'">Create Class</b-button>
+            </b-card>
+            <b-card title="Teachers">
+                <p v-if="this.teachers.length == 0">Your school has no teachers</p>
+                <b-list-group v-else v-for="teacher in this.teachers" :key="teacher.id">
+                </b-list-group>
+                <b-button variant="primary" class="mt-2">Create Teacher</b-button>
+            </b-card>
+        </b-col>
+        <b-col lg="3">
+            <n-link to="./edit-profile"><b-button squared block>Edit Profile</b-button></n-link>
+            <n-link to="./school/edit"><b-button squared block class="mt-2">Edit School</b-button></n-link>
+            <n-link to="./school/students"><b-button squared block class="mt-2">Student List</b-button></n-link>
+        </b-col>
+    </b-row>
+    <b-modal
+      id="createclass"
+      title="Create class"
+      @ok="createClass()"
+      ok-title="Create"
+    >
+        <b-form-input id="name" placeholder="Class name" type="text" v-model="newClassName" />
+    </b-modal>
+  </div>
+</template>
+
+<script>
+import TeacherClassItem from '../../components/TeacherClassItem';
+export default {
+    name: "AdministratorDashboard",
+    components: {
+        TeacherClassItem
+    },
+    data() {
+        return {
+            teachers: [],
+            classes: [],
+            name: JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).name,
+            newClassName: null
+        }
+    },
+    mounted() {
+        this.loadClasses();
+        this.loadTeachers();
+    },
+    methods: {
+        async loadClasses() {
+            await this.$axios.$get("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/classes", {
+                headers: {"Authorization": localStorage.getItem("authorization")}
+            })
+            .then((res) => {
+                this.classes = res;
+            })
+            .catch((e) => {
+            })
+        },
+        async loadTeachers() {
+            await this.$axios.$get("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/teachers", {
+                headers: {"Authorization": localStorage.getItem("authorization")}
+            })
+            .then((res) => {
+                this.teachers = res;
+            })
+            .catch((e) => {
+            })
+        },
+        async createClass() {
+            await this.$axios.$put("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/classes", [this.newClassName], {
+                headers: {"Authorization": localStorage.getItem("authorization")}
+            }).then((res) => {
+                if(res.length == 1) {
+                    this.classes.push({id: res[0].id, name: res[0].name});
+                    this.$toastr(
+                        "success",
+                        "Classes created successfully",
+                        "Creation successful"
+                    );
+                }
+            })
+            .catch((e) => {
+            })
+        }
+    }
+}
+</script>

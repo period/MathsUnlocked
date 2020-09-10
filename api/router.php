@@ -64,5 +64,10 @@
     else if($request["sliced"][1] == "school") {
         require_once("routes/school.php");
     }
-
+    else if($request["sliced"][1] == "teachers") {
+        require_once("routes/teachers.php");
+    }
+    else if($request["sliced"][1] == "students") {
+        require_once("routes/students.php");
+    }
     renderError("Unable to route request", 404);
