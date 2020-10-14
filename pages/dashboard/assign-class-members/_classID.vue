@@ -13,7 +13,7 @@
             <b-card title="Teachers">
                 <p v-if="this.teachers.length == 0">Your school has no teachers</p>
                 <draggable v-model="teachers" group="members" @start="drag=true" @end="drag=false" :move="handleMove">
-                    <div v-for="teacher in teachers" :key="teacher.id">{{teacher.name}}</div>
+                    <div v-for="teacher in teachers" :key="teacher.id"  :id="'assignclassmembers_teacher_' + teacher.id">{{teacher.name}}</div>
                 </draggable>
             </b-card>
         </b-col>
@@ -21,7 +21,7 @@
             <b-card title="Students">
                 <p v-if="this.students.length == 0">Your school has no students</p>
                 <draggable v-model="students" group="members" @start="drag=true" @end="drag=false" :move="handleMove">
-                    <div v-for="student in students" :key="student.id">{{student.name}}</div>
+                    <div v-for="student in students" :id="'assignclassmembers_student_' + student.id" :key="student.id">{{student.name}}</div>
                 </draggable>
             </b-card>
         </b-col>
@@ -29,7 +29,7 @@
             <b-card title="Class Members">
                 <p v-if="this.classMembers.length == 0">This class has no members</p>
                 <draggable v-model="classMembers" group="members" @start="drag=true" @end="drag=false" :move="handleMove">
-                    <div v-for="member in classMembers" :key="member.id">{{member.name}}</div>
+                    <div v-for="member in classMembers" :key="member.id" :id="'assignclassmembers_' + member.type + '_' + member.id">{{member.name}}</div>
                 </draggable>
             </b-card>
         </b-col>
@@ -62,7 +62,7 @@ export default {
     methods: {
         handleMove(evt) {
             console.log(evt);
-        }
+        },
         async loadClass() {
             if(this.classLoading == true) return;
             this.classLoading = true;
@@ -71,29 +71,30 @@ export default {
                 headers: {"Authorization": localStorage.getItem("authorization")}
             })
             .then((res) => {
+                this.className = res.name;
                 let studentIDs = [];
                 let teacherIDs = [];
                 for(var i = 0; i < res.students.length; i++) {
                     res.students[i].type == "student";
                     this.classMembers.push(res.students[i]);
-                    this.studentIDs.push(res.students[i].id);
+                    studentIDs.push(res.students[i].id);
                 }
                 for(var i = 0; i < res.teachers.length; i++) {
                     res.teachers[i].type == "teacher";
                     this.classMembers.push(res.teachers[i]);
-                    this.teacherIDs.push(res.teachers[i].id);
+                    teacherIDs.push(res.teachers[i].id);
                 }
-
+                
                 this.students = this.students.filter((student) => {
-                    return this.studentIDs.includes(student.id) == false;
+                    return studentIDs.includes(student.id) == false;
                 })
                 this.teachers = this.teachers.filter((teacher) => {
-                    return this.teacherIDs.includes(teacher.id) == false;
+                    return teacherIDs.includes(teacher.id) == false;
                 })
             })
             .catch((e) => {
             })
-        }
+        },
         async loadStudents() {
             await this.$axios.$get("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/students", {
                 headers: {"Authorization": localStorage.getItem("authorization")}
