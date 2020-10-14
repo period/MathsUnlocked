@@ -12,7 +12,7 @@
         <b-col lg="4">
             <b-card title="Teachers">
                 <p v-if="this.teachers.length == 0">Your school has no teachers</p>
-                <draggable v-model="teachers" group="members" @start="drag=true" @end="drag=false" :move="handleMove">
+                <draggable v-model="teachers" group="members" @start="drag=true" @end="drag=false" :move="handleMove" id="draggable_teachers">
                     <div v-for="teacher in teachers" :key="teacher.id"  :id="'assignclassmembers_teacher_' + teacher.id">{{teacher.name}}</div>
                 </draggable>
             </b-card>
@@ -20,7 +20,7 @@
         <b-col lg="4">
             <b-card title="Students">
                 <p v-if="this.students.length == 0">Your school has no students</p>
-                <draggable v-model="students" group="members" @start="drag=true" @end="drag=false" :move="handleMove">
+                <draggable v-model="students" group="members" @start="drag=true" @end="drag=false" :move="handleMove" id="draggable_students">
                     <div v-for="student in students" :id="'assignclassmembers_student_' + student.id" :key="student.id">{{student.name}}</div>
                 </draggable>
             </b-card>
@@ -28,7 +28,7 @@
         <b-col lg="4">
             <b-card title="Class Members">
                 <p v-if="this.classMembers.length == 0">This class has no members</p>
-                <draggable v-model="classMembers" group="members" @start="drag=true" @end="drag=false" :move="handleMove">
+                <draggable v-model="classMembers" group="members" @start="drag=true" @end="drag=false" :move="handleMove" id="draggable_class">
                     <div v-for="member in classMembers" :key="member.id" :id="'assignclassmembers_' + member.type + '_' + member.id">{{member.name}}</div>
                 </draggable>
             </b-card>
@@ -61,7 +61,31 @@ export default {
     },
     methods: {
         handleMove(evt) {
-            console.log(evt);
+            if(evt.dragged.id.includes("_student_") && evt.to.id == "draggable_teachers") return false;
+            if(evt.dragged.id.includes("_teacher_") && evt.to.id == "draggable_students") return false;
+
+            let type = evt.dragged.id.split("_")[1];
+            let uid = evt.dragged.id.split("_")[2];
+            let isAdd = (evt.to.id == "draggable_members");
+
+            this.modifyClass(type, isAdd, uid);
+        },
+        async modifyClass(type, isAdd, uid) {
+            let data = {id: uid};
+            if(isAdd) {
+                await this.$axios.$put("https://mathsunlockedapi.thomas.gg/class/" + this.classID + "/" + type, data, {
+                    headers: {"Authorization": localStorage.getItem("authorization")}
+                })
+                .then((res) => {
+                });
+            }
+            else {
+                await this.$axios.$delete("https://mathsunlockedapi.thomas.gg/class/" + this.classID + "/" + type, data, {
+                    headers: {"Authorization": localStorage.getItem("authorization")}
+                })
+                .then((res) => {
+                });
+            }
         },
         async loadClass() {
             if(this.classLoading == true) return;
@@ -75,12 +99,12 @@ export default {
                 let studentIDs = [];
                 let teacherIDs = [];
                 for(var i = 0; i < res.students.length; i++) {
-                    res.students[i].type == "student";
+                    res.students[i].type = "student";
                     this.classMembers.push(res.students[i]);
                     studentIDs.push(res.students[i].id);
                 }
                 for(var i = 0; i < res.teachers.length; i++) {
-                    res.teachers[i].type == "teacher";
+                    res.teachers[i].type = "teacher";
                     this.classMembers.push(res.teachers[i]);
                     teacherIDs.push(res.teachers[i].id);
                 }
