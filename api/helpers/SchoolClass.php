@@ -24,6 +24,23 @@
             $stmt->close();
             return true;
         }
+        public function delete($conn) {
+            $stmt = $conn->prepare("DELETE FROM classes WHERE id = ?;");
+            $stmt->bind_param("i", $this->id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM class_teachers WHERE class = ?;");
+            $stmt->bind_param("i", $this->id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM class_students WHERE class = ?;");
+            $stmt->bind_param("i", $this->id);
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        }
         public function save($conn) {
             $stmt = $conn->prepare("UPDATE classes SET name = ?, school = ? WHERE id = ?;");
             $stmt->bind_param("sis", $this->name, $this->school, $this->id);

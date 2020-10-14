@@ -46,6 +46,10 @@
         if($school->getName() == null) renderError("No such school with id", 404);
         if($auth["scope"] != "teacher") renderError("Teacher scope required", 403);
 
+        $teacher = new Teacher($auth["user_id"]);
+        $teacher->load($conn);
+        if($teacher->getSchool() != $request["sliced"][2]) renderError("Teacher does not belong to school");
+
         if($request["sliced"][3] == "students") {
             if($request["type"] == "PUT") {
                 validate([$request["input"] => "array"]);
@@ -67,6 +71,17 @@
                 }
                 die(json_encode($studentsCreated));
             }
+            if($request["type"] == "GET") {
+                $students = [];
+                $stmt = $conn->prepare("SELECT id, school, username, email, name FROM students WHERE school = ?;");
+                $stmt->bind_param("i", $school->getId());
+                $stmt->execute();
+                $stmt->bind_result($studentId, $studentSchool, $studentUsername, $studentEmail, $studentName);
+                while($stmt->fetch()) $students[] = ["id" => $studentId, "school" => $studentSchool, "username" => $studentUsername, "email" => $studentEmail, "name" => $studentName];
+                $stmt->close();
+
+                die(json_encode($students));
+            }
         }
         if($request["sliced"][3] == "classes") {
             if($request["type"] == "PUT") {
@@ -86,6 +101,17 @@
                     $classesCreated[] = $class->export();
                 }
                 die(json_encode($classesCreated));
+            }
+            if($request["type"] == "GET") {
+                $classes = [];
+                $stmt = $conn->prepare("SELECT id, name FROM classes WHERE school = ?;");
+                $stmt->bind_param("i", $school->getId());
+                $stmt->execute();
+                $stmt->bind_result($classId, $className);
+                while($stmt->fetch()) $classes[] = ["id" => $classId, "name" => $className];
+                $stmt->close();
+
+                die(json_encode($classes));
             }
         }
         if($request["sliced"][3] == "teachers") {
@@ -108,6 +134,17 @@
                 $teacher->create($conn);
 
                 die(json_encode($teacher->export()));
+            }
+            if($request["type"] == "GET") {
+                $teachers = [];
+                $stmt = $conn->prepare("SELECT id, school, username, email, name FROM teachers WHERE school = ?;");
+                $stmt->bind_param("i", $school->getId());
+                $stmt->execute();
+                $stmt->bind_result($teacherId, $teacherSchool, $teacherUsername, $teacherEmail, $teacherName);
+                while($stmt->fetch()) $teachers[] = ["id" => $teacherId, "school" => $teacherSchool, "username" => $teacherUsername, "email" => $teacherEmail, "name" => $teacherName];
+                $stmt->close();
+
+                die(json_encode($teachers));
             }
         }
     }

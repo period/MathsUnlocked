@@ -33,6 +33,10 @@
         die("{}");
     }
 
+    if(!isset($request["sliced"][3]) && $request["type"] == "PATCH") {
+        // todo: delete teacher
+    }
+
     if(!isset($request["sliced"][3])) renderError("Unable to route request", 404);
 
     if($request["sliced"][3] == "qr" && $request["type"] == "GET") {

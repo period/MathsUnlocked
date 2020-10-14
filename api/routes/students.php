@@ -36,6 +36,10 @@
         die("{}");
     }
 
+    if(!isset($request["sliced"][3]) && $request["type"] == "DELETE" && $auth["scope"] == "teacher") {
+        // todo: delete student account
+    }
+
     if(!isset($request["sliced"][3])) renderError("Unable to route request", 404);
 
     if($request["sliced"][3] == "token" && $request["type"] == "POST") {
