@@ -66,23 +66,19 @@ export default {
 
             let type = evt.dragged.id.split("_")[1];
             let uid = evt.dragged.id.split("_")[2];
-            let isAdd = (evt.to.id == "draggable_members");
+            let isAdd = (evt.to.id == "draggable_class");
 
             this.modifyClass(type, isAdd, uid);
         },
         async modifyClass(type, isAdd, uid) {
-            let data = {id: uid};
-            if(isAdd) {
-                await this.$axios.$put("https://mathsunlockedapi.thomas.gg/class/" + this.classID + "/" + type, data, {
-                    headers: {"Authorization": localStorage.getItem("authorization")}
-                })
+            uid = parseInt(uid);
+            if(isAdd == true) {
+                await this.$axios.put("https://mathsunlockedapi.thomas.gg/class/" + this.classID + "/" + type + "/" + uid)
                 .then((res) => {
                 });
             }
             else {
-                await this.$axios.$delete("https://mathsunlockedapi.thomas.gg/class/" + this.classID + "/" + type, data, {
-                    headers: {"Authorization": localStorage.getItem("authorization")}
-                })
+                await this.$axios.delete("https://mathsunlockedapi.thomas.gg/class/" + this.classID + "/" + type + "/" + uid)
                 .then((res) => {
                 });
             }

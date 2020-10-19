@@ -38,6 +38,7 @@ export default {
   plugins: [
     '~/plugins/v-toastr',
     '~/plugins/qrcode',
+    '~/plugins/axios',
   ],
   /*
   ** Nuxt.js dev-modules
