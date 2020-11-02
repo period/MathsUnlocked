@@ -6,14 +6,9 @@
         <div class="row" v-if="!started && loaded">
             <div class="col-12 text-center">
                 <h1>{{ task.activity }}</h1>
-                <div class="offset-md-3 col-6">
-                    <ul>
-                        <li v-if="task.notes != null"><strong>Your teacher has left the following notes: </strong> {{ task.notes }}</li>
-                        <li><strong>Due date: </strong> <span v-if="task.due != null">{{ task.due }}</span><span v-else>No due date set</span></li>
-                        <li><strong>Completed at: </strong> <span v-if="task.completed != null">{{ task.completed }}</span><span v-else class="text-danger">You have not checked this task out yet</span></li>
-
-                    </ul>
-                </div>
+                        <p v-if="task.notes != null"><strong>Your teacher has left the following notes: </strong> {{ task.notes }}</p>
+                        <p><strong>Due date: </strong> <span v-if="task.due != null">{{ new Date(task.due*1000).toString() }}</span><span v-else>No due date set</span></p>
+                        <p><strong>Completed at: </strong> <span v-if="task.completed != null">{{ new Date(task.completed*1000).toString() }}</span><span v-else class="text-danger">You have not checked this task out yet</span></p>
                 <b-button block variant="primary" @click="started = true">Start</b-button>
             </div>
         </div>
@@ -34,7 +29,7 @@
                     <b-button block variant="primary" @click="checkout()" :disabled="!canCheckout()">Checkout</b-button>
                 </div>
                 <div v-else>
-                    <p><strong>Score: {{ task.questions.filter((question) => { return question.data.submitted_answer == question.data.answer.value}).length }} out of {{ task.questions.length }} </strong></p>
+                    <p><strong>Score: {{ task.questions.filter((question) => { return question.data.submitted_answer == question.data.answer.value}).length }} out of {{ task.questions.length }}</strong></p>
                     <p>This task has been checked out! No further modifications can be made.</p>
                 </div>
             </div>
