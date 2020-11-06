@@ -16,7 +16,9 @@
             <h1 class="text-center">Hello, {{ name }}</h1>
             <b-card title="Assigned Activities">
                 <p v-if="this.assigned_activities.length == 0">You have no assigned activities due 🙌🏻</p>
-                <div v-else></div>
+                <div v-else>
+                    <task-list :tasks="assigned_activities" />
+                </div>
             </b-card>
             <b-card title="Activities">
                 <available-activity-list v-on:activity="createTaskFromActivity" />
@@ -31,11 +33,14 @@
 </template>
 
 <script>
-import AvailableActivityList from '~/components/AvailableActivityList'
+import AvailableActivityList from '~/components/AvailableActivityList';
+import TaskList from '~/components/TaskList';
+
 export default {
     name: "StudentDashboard",
     components: {
-        AvailableActivityList
+        AvailableActivityList,
+        TaskList
     },
     data() {
         return {
@@ -46,6 +51,12 @@ export default {
         }
     },
     methods: {
+        async loadAssignedActivities() {
+            await this.$axios.$get("https://mathsunlockedapi.thomas.gg/students/" + JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).user_id + "/tasks")
+            .then((res) => {
+                this.assigned_activities = res.filter((task) => { return task.teacher != null && task.completed == null })
+            });
+        },
         async createTaskFromActivity(activityID) {
             await this.$axios.$put("https://mathsunlockedapi.thomas.gg/students/" + JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).user_id + "/tasks", {
                 activity: activityID
@@ -58,6 +69,9 @@ export default {
             if(this.assigned_activities.length > 0) return true;
             return false;
         }
+    },
+    mounted() {
+        this.loadAssignedActivities();
     }
 }
 </script>
