@@ -7,7 +7,6 @@
           <fa :icon="['fas', 'ellipsis-h']" />
         </template>
         <b-dropdown-item @click="assignTask()">Assign task</b-dropdown-item>
-        <b-dropdown-item @click="assignClasses()">Assign classes</b-dropdown-item>
         <b-dropdown-item v-b-modal="'modifystudent' + student.id">Modify student details</b-dropdown-item>
         <b-dropdown-item v-b-modal="'qrcode' + student.id">Generate QR Code</b-dropdown-item>
         <b-dropdown-item v-b-modal="'viewasstudent' + student.id">View as student</b-dropdown-item>
@@ -53,8 +52,10 @@ export default {
     }
   },
   methods: {
-      assignTask() {},
-      assignClasses() {},
+    assignTask() {
+      sessionStorage.setItem("assign_task_students", JSON.stringify([this.student.id]));
+      $nuxt.$router.push("./assign-task");
+    },
       async viewAsStudent() {
         await this.$axios.$post("https://mathsunlockedapi.thomas.gg/students/" + this.student.id + "/token", {}, {
           headers: {"Authorization": localStorage.getItem("authorization")}

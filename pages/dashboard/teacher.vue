@@ -10,9 +10,14 @@
                 </b-list-group>
                 <n-link :to="getStudentsURL()"><small>Looking for all students in the school?</small></n-link>
             </b-card>
+            <br>
             <b-card title="Your Classes">
                 <p v-if="this.classes.length == 0">You are not assigned to any classes</p>
-                <div v-else></div>
+                <div v-else>
+                    <b-list-group v-for="schoolClass in this.classes" :key="schoolClass.id">
+                        <teacher-class-item :schoolclass="schoolClass" />
+                    </b-list-group>
+                </div>
                 <n-link :to="getClassesURL()"><small>Looking for all classes in the school?</small></n-link>
             </b-card>
         </b-col>
@@ -25,10 +30,13 @@
 
 <script>
 import TeacherStudentItem from '../../components/TeacherStudentItem';
+import TeacherClassItem from '../../components/TeacherClassItem';
+
 export default {
     name: "TeacherDashboard",
     components: {
-        TeacherStudentItem
+        TeacherStudentItem,
+        TeacherClassItem
     },
     data() {
         return {
@@ -39,8 +47,19 @@ export default {
     },
     mounted() {
         this.loadStudents();
+        this.loadClasses();
     },
     methods: {
+        async loadClasses() {
+            await this.$axios.$get("https://mathsunlockedapi.thomas.gg/teachers/" + localStorage.getItem("userid") + "/classes", {
+                headers: {"Authorization": localStorage.getItem("authorization")}
+            })
+            .then((res) => {
+                this.classes = res;
+            })
+            .catch((e) => {
+            })
+        },
         async loadStudents() {
             await this.$axios.$get("https://mathsunlockedapi.thomas.gg/teachers/" + localStorage.getItem("userid") + "/students", {
                 headers: {"Authorization": localStorage.getItem("authorization")}

@@ -20,6 +20,7 @@
                     <task-list :tasks="assigned_activities" />
                 </div>
             </b-card>
+            <br>
             <b-card title="Activities">
                 <available-activity-list v-on:activity="createTaskFromActivity" />
             </b-card>

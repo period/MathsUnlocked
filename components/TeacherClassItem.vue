@@ -6,6 +6,7 @@
         <template v-slot:button-content>
           <fa :icon="['fas', 'ellipsis-h']" />
         </template>
+        <b-dropdown-item @click="assignTask">Assign task</b-dropdown-item>
         <b-dropdown-item v-b-modal="'renameclass' + schoolclass.id">Rename class</b-dropdown-item>
         <b-dropdown-item :to="'./assign-class-members/' + schoolclass.id">Modify class members</b-dropdown-item>
         <b-dropdown-item v-b-modal="'deleteclass' + schoolclass.id">Delete class</b-dropdown-item>
@@ -45,6 +46,19 @@ export default {
     }
   },
   methods: {
+      async assignTask() {
+        await this.$axios.$get("https://mathsunlockedapi.thomas.gg/class/" + this.schoolclass.id, {
+              headers: {"Authorization": localStorage.getItem("authorization")}
+          })
+          .then((res) => {
+            let studentList = [];
+            for(var i = 0; i < res.students.length; i++) studentList.push(res.students[i].id);
+            sessionStorage.setItem("assign_task_students", JSON.stringify(studentList));
+            $nuxt.$router.push("./assign-task");
+          })
+          .catch((e) => {
+          })
+      },
       async renameClass() {
           await this.$axios.$patch("https://mathsunlockedapi.thomas.gg/class/" + this.schoolclass.id, {name: this.newClassName}, {
               headers: {"Authorization": localStorage.getItem("authorization")}
