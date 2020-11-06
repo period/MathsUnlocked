@@ -19,8 +19,7 @@
                 <div v-else></div>
             </b-card>
             <b-card title="Activities">
-                <p v-if="this.activities.length == 0">There are no activities available</p>
-                <div v-else></div>
+                <available-activity-list v-on:activity="createTaskFromActivity" />
             </b-card>
         </b-col>
         <b-col lg="3">
@@ -32,10 +31,11 @@
 </template>
 
 <script>
-
+import AvailableActivityList from '~/components/AvailableActivityList'
 export default {
     name: "StudentDashboard",
     components: {
+        AvailableActivityList
     },
     data() {
         return {
@@ -46,6 +46,14 @@ export default {
         }
     },
     methods: {
+        async createTaskFromActivity(activityID) {
+            await this.$axios.$put("https://mathsunlockedapi.thomas.gg/students/" + JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).user_id + "/tasks", {
+                activity: activityID
+            })
+            .then((res) => {
+                $nuxt.$router.push("/task/" + res.task);
+            });
+        },
         disableLiveMaths() {
             if(this.assigned_activities.length > 0) return true;
             return false;
