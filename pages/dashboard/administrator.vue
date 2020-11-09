@@ -13,6 +13,7 @@
             <b-card title="Teachers">
                 <p v-if="this.teachers.length == 0">Your school has no teachers</p>
                 <b-list-group v-else v-for="teacher in this.teachers" :key="teacher.id">
+                    <teacher-teacher-item :teacher="teacher" />
                 </b-list-group>
             </b-card>
         </b-col>
@@ -45,10 +46,12 @@
 
 <script>
 import TeacherClassItem from '../../components/TeacherClassItem';
+import TeacherTeacherItem from '~/components/TeacherTeacherItem';
 export default {
     name: "AdministratorDashboard",
     components: {
-        TeacherClassItem
+        TeacherClassItem,
+        TeacherTeacherItem
     },
     data() {
         return {
