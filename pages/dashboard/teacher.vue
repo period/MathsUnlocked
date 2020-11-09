@@ -8,7 +8,7 @@
                 <b-list-group v-else v-for="student in this.students" :key="student.id">
                     <teacher-student-item :student="student" />
                 </b-list-group>
-                <n-link :to="getStudentsURL()"><small>Looking for all students in the school?</small></n-link>
+                <n-link to="school/students"><small>Looking for all students in the school?</small></n-link>
             </b-card>
             <br>
             <b-card title="Your Classes">
@@ -18,11 +18,12 @@
                         <teacher-class-item :schoolclass="schoolClass" />
                     </b-list-group>
                 </div>
-                <n-link :to="getClassesURL()"><small>Looking for all classes in the school?</small></n-link>
+                <n-link to="school/classes"><small>Looking for all classes in the school?</small></n-link>
             </b-card>
         </b-col>
         <b-col lg="3">
             <n-link to="./edit-profile"><b-button squared block>Edit Profile</b-button></n-link>
+            <n-link v-if="isAdministrator" to="./administrator"><b-button class="mt-2" squared block>Administrator Dashboard</b-button></n-link>
         </b-col>
     </b-row>
   </div>
@@ -43,13 +44,25 @@ export default {
             students: [],
             classes: [],
             name: JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).name,
+            isAdministrator: false
         }
     },
     mounted() {
+        this.checkIfAdministrator();
         this.loadStudents();
         this.loadClasses();
     },
     methods: {
+        async checkIfAdministrator() {
+            await this.$axios.$get("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID"), {
+                headers: {"Authorization": localStorage.getItem("authorization")}
+            })
+            .then((res) => {
+                if(res.owner == JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).user_id) this.isAdministrator = true;
+            })
+            .catch((e) => {
+            })
+        },
         async loadClasses() {
             await this.$axios.$get("https://mathsunlockedapi.thomas.gg/teachers/" + localStorage.getItem("userid") + "/classes", {
                 headers: {"Authorization": localStorage.getItem("authorization")}
@@ -69,12 +82,6 @@ export default {
             })
             .catch((e) => {
             })
-        },
-        getStudentsURL() {
-            return "/school/" + localStorage.getItem("schoolID") + "/students";
-        },
-        getClassesURL() {
-            return "/school/" + localStorage.getItem("schoolID") + "/classes";
         },
     }
 }

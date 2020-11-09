@@ -14,13 +14,14 @@
                 <p v-if="this.teachers.length == 0">Your school has no teachers</p>
                 <b-list-group v-else v-for="teacher in this.teachers" :key="teacher.id">
                 </b-list-group>
-                <b-button variant="primary" class="mt-2">Create Teacher</b-button>
             </b-card>
         </b-col>
         <b-col lg="3">
             <n-link to="./edit-profile"><b-button squared block>Edit Profile</b-button></n-link>
-            <n-link to="./school/edit"><b-button squared block class="mt-2">Edit School</b-button></n-link>
+            <b-button squared block class="mt-2"  v-b-modal="'editschool'">Edit School</b-button>
             <n-link to="./school/students"><b-button squared block class="mt-2">Student List</b-button></n-link>
+            <n-link to="./teacher"><b-button squared block class="mt-2">Teacher Dashboard</b-button></n-link>
+            <n-link to="../setup/teachers"><b-button squared block class="mt-2">Setup Wizard</b-button></n-link>
         </b-col>
     </b-row>
     <b-modal
@@ -30,6 +31,14 @@
       ok-title="Create"
     >
         <b-form-input id="name" placeholder="Class name" type="text" v-model="newClassName" />
+    </b-modal>
+    <b-modal
+      id="editschool"
+      title="Edit school"
+      @ok="editSchool()"
+      ok-title="Save"
+    >
+        <b-form-input id="name" placeholder="School name" type="text" v-model="newSchoolName" />
     </b-modal>
   </div>
 </template>
@@ -46,7 +55,8 @@ export default {
             teachers: [],
             classes: [],
             name: JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).name,
-            newClassName: null
+            newClassName: null,
+            newSchoolName: null
         }
     },
     mounted() {
@@ -54,6 +64,19 @@ export default {
         this.loadTeachers();
     },
     methods: {
+        async editSchool() {
+            await this.$axios.$patch("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID"), {name: this.newSchoolName}, {
+                headers: {"Authorization": localStorage.getItem("authorization")}
+            }).then((res) => {
+                this.$toastr(
+                    "success",
+                    "School modified successfully",
+                    "Modification successful"
+                );
+            })
+            .catch((e) => {
+            })
+        },
         async loadClasses() {
             await this.$axios.$get("https://mathsunlockedapi.thomas.gg/school/" + localStorage.getItem("schoolID") + "/classes", {
                 headers: {"Authorization": localStorage.getItem("authorization")}
