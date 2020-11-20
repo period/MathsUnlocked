@@ -2,6 +2,7 @@
   <div>
     <b-list-group-item>
       {{ student.name }}
+      <span v-if="student.points_last_week != null">(<strong>{{student.points_last_week}}</strong> points last 7 days)</span>
       <b-dropdown class="float-right">
         <template v-slot:button-content>
           <fa :icon="['fas', 'ellipsis-h']" />

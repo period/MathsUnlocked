@@ -10,6 +10,7 @@
             </b-card>
             <b-card title="Weekly Points" class="text-center mt-2">
                 <b-card-text>{{ this.points.reduce((a, b) => a + b, 0) }}</b-card-text>
+                <bar-chart v-if="chartData != null" :data="chartData" />
             </b-card>
         </b-col>
         <b-col lg="6">
@@ -37,12 +38,14 @@
 <script>
 import AvailableActivityList from '~/components/AvailableActivityList';
 import TaskList from '~/components/TaskList';
+import BarChart from '~/components/charts/BarChart';
 
 export default {
     name: "StudentDashboard",
     components: {
         AvailableActivityList,
-        TaskList
+        TaskList,
+        BarChart
     },
     data() {
         return {
@@ -67,6 +70,22 @@ export default {
                 $nuxt.$router.push("/task/" + res.task);
             });
         },
+        getDateWithOffset(offset) {
+            return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][new Date(new Date().getTime() - (offset*86400000)).getDay()];
+        },
+        async loadPoints() {
+            await this.$axios.$get("https://mathsunlockedapi.thomas.gg/students/" + JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).user_id)
+            .then((res) => {
+                this.points = res.points;
+                this.chartData = {
+                    labels: [this.getDateWithOffset(0), this.getDateWithOffset(1), this.getDateWithOffset(2), this.getDateWithOffset(3), this.getDateWithOffset(4), this.getDateWithOffset(5), this.getDateWithOffset(6)],
+                    datasets: [{
+                        label: "Points earned",
+                        data: res.points
+                    }]
+                }
+            });
+        },
         disableLiveMaths() {
             if(this.assigned_activities.length > 0) return true;
             return false;
@@ -74,6 +93,7 @@ export default {
     },
     mounted() {
         this.loadAssignedActivities();
+        this.loadPoints();
     }
 }
 </script>

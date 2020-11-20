@@ -15,9 +15,11 @@
     "@nuxtjs/axios": "^5.12.2",
     "bootstrap": "^4.5.2",
     "bootstrap-vue": "^2.16.0",
+    "chart.js": "^2.9.4",
     "nuxt": "^2.14.4",
     "nuxt-fontawesome": "^0.4.0",
     "vue": "^2.6.12",
+    "vue-chartjs": "^3.5.1",
     "vue-qrcode-reader": "^2.3.13",
     "vuedraggable": "^2.24.1"
   },

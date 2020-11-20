@@ -38,6 +38,17 @@
                     <div v-if="current_question == question.id">
                         <h1>Question #{{question.position}}</h1>
                         <h3>{{ question.data.question.title }}</h3>
+                        <div v-if="question.data.chart != null" style="max-width: 50%;">
+                            <div v-if="question.data.chart.type == 'pie'">
+                                <pie-chart :data="question.data.chart.chartjs" />
+                            </div>
+                            <div v-if="question.data.chart.type == 'line'">
+                                <line-chart :data="question.data.chart.chartjs" />
+                            </div>
+                            <div v-if="question.data.chart.type == 'bar'">
+                                <bar-chart :data="question.data.chart.chartjs" />
+                            </div>
+                        </div>
                         <b-input-group>
                             <b-form-input type="number" :disabled="task.completed != null" v-model="answers[question.id]" />
                             <b-input-group-append v-if="task.completed == null">
@@ -53,9 +64,13 @@
     </div>
 </template>
 <script>
+import PieChart from "~/components/charts/PieChart";
+import LineChart from "~/components/charts/LineChart";
+import BarChart from "~/components/charts/BarChart";
+
 export default {
     name: "Task",
-    components: {},
+    components: {PieChart, LineChart, BarChart},
     data() {
         return {
             task: {questions: []},
