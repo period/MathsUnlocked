@@ -9,7 +9,7 @@
             </div>
         </b-col>
         <b-col lg="3">
-            <n-link to="./dashboard/student"><b-button squared block>Dashboard</b-button></n-link>
+            <n-link to="/dashboard/student"><b-button squared block>Dashboard</b-button></n-link>
         </b-col>
     </b-row>
   </div>

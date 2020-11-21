@@ -67,6 +67,7 @@ export default {
                 localStorage.setItem("authorization", res.token);
                 this.$forceUpdate();
                 $nuxt.$router.push("/dashboard/student");
+                $nuxt.$emit("navbar_update");
             })
             .catch((e) => {
             })

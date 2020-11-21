@@ -8,6 +8,7 @@
         <b-navbar-nav>
         </b-navbar-nav>
         <b-navbar-nav class="ml-auto">
+          <b-button @click="dashboard()" v-if="isLoggedIn()" class="mr-2">Dashboard</b-button>
           <b-button to="/login" v-if="!isLoggedIn()">Login</b-button>
           <b-button @click="logout()" v-else>Logout</b-button>
         </b-navbar-nav>
@@ -31,11 +32,19 @@ export default {
   mounted() {
     if(localStorage.getItem("authorization") != null) this.name = JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).name;
     this.isVAS = localStorage.getItem('view_as_student_teacher_token') != null;
+    this.$nuxt.$on("navbar_update", () => {
+      this.isVAS = localStorage.getItem('view_as_student_teacher_token') != null;
+      this.$forceUpdate();
+    })
   },
   methods: {
+    dashboard() {
+      $nuxt.$router.push("/dashboard/" + JSON.parse(atob(localStorage.getItem("authorization").split(".")[1])).scope);
+    },
     stopViewAsStudent() {
       localStorage.setItem("authorization", localStorage.getItem("view_as_student_teacher_token"));
       localStorage.removeItem("view_as_student_teacher_token");
+      this.isVAS = localStorage.getItem('view_as_student_teacher_token') != null;
       this.$forceUpdate();
       $nuxt.$router.push("/dashboard/teacher");
     },
@@ -49,6 +58,7 @@ export default {
       localStorage.removeItem("authorization");
       localStorage.removeItem("view_as_student_teacher_token");
       $nuxt.$router.push("/");
+      this.$forceUpdate();
     }
   }
 };

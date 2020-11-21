@@ -65,6 +65,7 @@ export default {
                 "Login successful"
             );
             $nuxt.$router.push('/dashboard/' + JSON.parse(atob(res.token.split(".")[1])).scope)
+            $nuxt.$emit("navbar_update");
         },
         async loginQR(jwt) {
             this.activeRequest = true;
