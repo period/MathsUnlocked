@@ -7,6 +7,7 @@
         <template v-slot:button-content>
           <fa :icon="['fas', 'ellipsis-h']" />
         </template>
+        <b-dropdown-item :to="'/dashboard/show-student-tasks/' + student.id">Show tasks</b-dropdown-item>
         <b-dropdown-item @click="assignTask()">Assign task</b-dropdown-item>
         <b-dropdown-item v-b-modal="'modifystudent' + student.id">Modify student details</b-dropdown-item>
         <b-dropdown-item v-b-modal="'qrcode' + student.id">Generate QR Code</b-dropdown-item>

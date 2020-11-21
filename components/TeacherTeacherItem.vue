@@ -6,6 +6,7 @@
         <template v-slot:button-content>
           <fa :icon="['fas', 'ellipsis-h']" />
         </template>
+        <b-dropdown-item :to="'/dashboard/show-teacher-tasks/' + teacher.id">Show tasks by teacher</b-dropdown-item>
         <b-dropdown-item v-b-modal="'modifytecher' + teacher.id">Modify teacher details</b-dropdown-item>
         <b-dropdown-item v-b-modal="'qrcode' + teacher.id">Generate QR Code</b-dropdown-item>
       </b-dropdown>

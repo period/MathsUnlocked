@@ -8,7 +8,8 @@
         </template>
         <b-dropdown-item @click="assignTask">Assign task</b-dropdown-item>
         <b-dropdown-item v-b-modal="'renameclass' + schoolclass.id">Rename class</b-dropdown-item>
-        <b-dropdown-item :to="'./assign-class-members/' + schoolclass.id">Modify class members</b-dropdown-item>
+        <b-dropdown-item :to="'/dashboard/assign-class-members/' + schoolclass.id">Modify class members</b-dropdown-item>
+        <b-dropdown-item :to="'/dashboard/show-class-tasks/' + schoolclass.id">Show tasks</b-dropdown-item>
         <b-dropdown-item v-b-modal="'deleteclass' + schoolclass.id">Delete class</b-dropdown-item>
       </b-dropdown>
     </b-list-group-item>
