@@ -26,7 +26,6 @@
                     <b-form-input id="password" placeholder="Password" type="password" v-model="password" />
                 </b-input-group>
                 <div class="mt-3"><b-button variant="primary" v-b-modal="'qrlogin'">QR Code</b-button> <b-button variant="primary" :disabled="disableLoginBtn()" @click="login()">Login</b-button></div>
-                <div class="mt-2"><n-link to="/password-reset">Forgot your password?</n-link></div>
             </b-card-body>
             </b-card>
         </b-col>
