@@ -6,7 +6,7 @@
         <div class="row" v-if="!started && loaded">
             <div class="col-12 text-center">
                 <h1>{{ task.activity }}</h1>
-                        <p v-if="task.notes != null"><strong>Your teacher has left the following notes: </strong> {{ task.notes }}</p>
+                        <p v-if="task.remarks != null"><strong>Your teacher has left the following remarks: </strong> {{ task.remarks }}</p>
                         <p><strong>Due date: </strong> <span v-if="task.due != null">{{ new Date(task.due*1000).toString() }}</span><span v-else>No due date set</span></p>
                         <p><strong>Completed at: </strong> <span v-if="task.completed != null">{{ new Date(task.completed*1000).toString() }}</span><span v-else class="text-danger">You have not checked this task out yet</span></p>
                 <b-button block variant="primary" @click="started = true">Start</b-button>
