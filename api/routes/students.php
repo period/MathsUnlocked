@@ -40,7 +40,73 @@
         // todo: delete student account
     }
 
+    if(!isset($request["sliced"][3]) && $request["type"] == "GET") {
+        $res = $student->export();
+        $res["points"] = [0,0,0,0,0,0,0];
+
+        $stmt = $conn->prepare("SELECT amount, timestamp FROM points WHERE student = ? AND timestamp > UNIX_TIMESTAMP()-(86400*7);");
+        $studentId = $student->getId();
+        $stmt->bind_param("i", $studentId);
+        $stmt->execute();
+        $stmt->bind_result($points, $timestamp);
+        while($stmt->fetch()) {
+            $daysAgo = round((time()-$timestamp) / 86400);
+            $res["points"][$daysAgo] += $points;
+        }
+        die(json_encode($res));
+    }
+
     if(!isset($request["sliced"][3])) renderError("Unable to route request", 404);
+
+    if($request["sliced"][3] == "tasks") {
+        if($request["type"] == "PUT") {
+            validate([$request["input"]["activity"] => "int"]);
+            $stmt = $conn->prepare("SELECT name FROM activities WHERE id = ?;");
+            $stmt->bind_param("i", $request["input"]["activity"]);
+            $stmt->execute();
+            $stmt->bind_result($activityName);
+            $stmt->fetch();
+            $stmt->close();
+
+            if(empty($activityName)) renderError("Activity does not exist");
+            require_once("/var/www/mathsunlocked/api/helpers/Task.php");
+            $task = new Task(null);
+            $task->setStudent($student->getId());
+            if($auth["scope"] == "teacher") {
+                $task->setTeacher($auth["user_id"]);
+                if(isset($request["input"]["remarks"])) {
+                    validate([$request["input"]["remarks"] => "string|alnumspace"]);
+                    if(strlen($request["input"]["remarks"]) > 2048) renderError("Remarks cannot exceed 2048 characters");
+                    $task->setRemarks($request["input"]["remarks"]);
+                }
+                if(isset($request["input"]["due"])) {
+                    validate([$request["input"]["due"] => "int"]);
+                    if($request["input"]["due"] <= time()) renderError("Due date cannot be in the past");
+                    $task->setDue($request["input"]["due"]);
+                }
+            }
+            $task->setCreated(time());
+            $task->setActivity($activityName);
+
+            $task->create($conn);
+            $task->initialise($conn, $request["input"]["activity"]);
+
+            die(json_encode(["task" => $task->getId()]));
+        }
+        if($request["type"] == "GET") {
+            $tasks = [];
+            $stmt = $conn->prepare("SELECT id, student, (SELECT name FROM students WHERE students.id = student), teacher, (SELECT name FROM teachers WHERE teachers.id = teacher), created, due, started, completed, activity, remarks FROM tasks WHERE student = ?;");
+            $studentId = $student->getId();
+            $stmt->bind_param("i", $studentId);
+            $stmt->execute();
+            $stmt->bind_result($taskId, $taskStudent, $taskStudentName, $taskTeacher, $taskTeacherName, $taskCreated, $taskDue, $taskStarted, $taskCompleted, $taskActivity, $taskRemarks);
+            while($stmt->fetch()) {
+                $tasks[] = ["id" => $taskId, "student" => ["id" => $taskStudent, "name" => $taskStudentName], "teacher" => ["id" => $taskTeacher, "name" => $taskTeacherName], "created" => $taskCreated, "due" => $taskDue, "started" => $taskStarted, "completed" => $taskCompleted, "activity" => $taskActivity, "remarks" => $taskRemarks];
+            }
+            $stmt->close();
+            die(json_encode($tasks));
+        }
+    }
 
     if($request["sliced"][3] == "token" && $request["type"] == "POST") {
         if($auth["scope"] != "teacher") renderError("Teacher scope required", 403);        

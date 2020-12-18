@@ -46,7 +46,8 @@
 
     if($request["sliced"][3] == "students" && $request["type"] == "GET") {
         $stmt = $conn->prepare("SELECT id, school, username, email, name FROM students WHERE id IN (SELECT student FROM class_students WHERE class IN (SELECT class FROM class_teachers WHERE teacher = ?));");
-        $stmt->bind_param("i", $teacher->getId());
+        $tid = $teacher->getId();
+        $stmt->bind_param("i", $tid);
         $stmt->execute();
         $stmt->bind_result($studentID, $studentSchool, $studentUsername, $studentEmail, $studentName);
         $students = [];
@@ -55,4 +56,30 @@
             $students[] = $student->export();
         }
         die(json_encode($students));
+    }
+    if($request["sliced"][3] == "classes" && $request["type"] == "GET") {
+        $stmt = $conn->prepare("SELECT id, school, name FROM classes WHERE id IN (SELECT class FROM class_teachers WHERE teacher = ?);");
+        $tid = $teacher->getId();
+        $stmt->bind_param("i", $tid);
+        $stmt->execute();
+        $stmt->bind_result($classID, $classSchool, $className);
+        $classes = [];
+        while($stmt->fetch()) {
+            $classes[] = ["id" => $classID, "school" => $classSchool, "name" => $className];
+        }
+        die(json_encode($classes));
+    }
+
+    if($request["sliced"][3] == "tasks" && $request["type"] == "GET") {
+        $tasks = [];
+        $stmt = $conn->prepare("SELECT id, student, (SELECT name FROM students WHERE students.id = student), teacher, (SELECT name FROM teachers WHERE teachers.id = teacher), created, due, started, completed, activity, remarks FROM tasks WHERE teacher IS NOT NULL and teacher = ?;");
+        $teacherId = $teacher->getId();
+        $stmt->bind_param("i", $teacherId);
+        $stmt->execute();
+        $stmt->bind_result($taskId, $taskStudent, $taskStudentName, $taskTeacher, $taskTeacherName, $taskCreated, $taskDue, $taskStarted, $taskCompleted, $taskActivity, $taskRemarks);
+        while($stmt->fetch()) {
+            $tasks[] = ["id" => $taskId, "student" => ["id" => $taskStudent, "name" => $taskStudentName], "teacher" => ["id" => $taskTeacher, "name" => $taskTeacherName], "created" => $taskCreated, "due" => $taskDue, "started" => $taskStarted, "completed" => $taskCompleted, "activity" => $taskActivity, "remarks" => $taskRemarks];
+        }
+        $stmt->close();
+        die(json_encode($tasks));
     }

@@ -50,6 +50,17 @@
         $teacher->load($conn);
         if($teacher->getSchool() != $request["sliced"][2]) renderError("Teacher does not belong to school");
 
+        if(!isset($request["sliced"][3]) && $request["type"] == "GET") die(json_encode($school->export()));
+        if(!isset($request["sliced"][3]) && $request["type"] == "PATCH") {
+            validate([$request["input"]["name"] => "string|alnumspace"]);
+            if($auth["user_id"] != $school->getOwner()) renderError("You need to be the administrator of the school to create students", 403);
+
+            if(isset($request["input"]["name"])) $school->setName($request["input"]["name"]);
+
+            $school->save($conn);
+            die(json_encode($school->export()));
+        }
+
         if($request["sliced"][3] == "students") {
             if($request["type"] == "PUT") {
                 validate([$request["input"] => "array"]);
@@ -73,11 +84,11 @@
             }
             if($request["type"] == "GET") {
                 $students = [];
-                $stmt = $conn->prepare("SELECT id, school, username, email, name FROM students WHERE school = ?;");
+                $stmt = $conn->prepare("SELECT id, school, username, email, name, (SELECT SUM(amount) FROM points WHERE student = id AND timestamp > UNIX_TIMESTAMP()-(86400*7)) FROM students WHERE school = ?;");
                 $stmt->bind_param("i", $school->getId());
                 $stmt->execute();
-                $stmt->bind_result($studentId, $studentSchool, $studentUsername, $studentEmail, $studentName);
-                while($stmt->fetch()) $students[] = ["id" => $studentId, "school" => $studentSchool, "username" => $studentUsername, "email" => $studentEmail, "name" => $studentName];
+                $stmt->bind_result($studentId, $studentSchool, $studentUsername, $studentEmail, $studentName, $pointsLastWeek);
+                while($stmt->fetch()) $students[] = ["id" => $studentId, "school" => $studentSchool, "username" => $studentUsername, "email" => $studentEmail, "name" => $studentName, "points_last_week" => $pointsLastWeek];
                 $stmt->close();
 
                 die(json_encode($students));

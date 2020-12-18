@@ -79,4 +79,8 @@
     else if($request["sliced"][1] == "activities") {
         require_once("routes/activities.php");
     }
+    else if($request["sliced"][1] == "tasks") {
+        require_once("routes/tasks.php");
+    }
+
     renderError("Unable to route request", 404);

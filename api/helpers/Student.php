@@ -43,6 +43,13 @@
             return $res;
         }
 
+        public function addPoints($conn, $amount, $reason) {
+            $stmt = $conn->prepare("INSERT INTO points VALUES (?, ?, UNIX_TIMESTAMP(), ?);");
+            $stmt->bind_param("iis", $this->id, $amount, $reason);
+            $stmt->execute();
+            $stmt->close();
+        }
+
         public function getId() {
             return $this->id;
         }

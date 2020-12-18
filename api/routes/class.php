@@ -41,36 +41,49 @@
         }
     }
     else {
+        if($request["type"] == "GET" && $request["sliced"][3] == "tasks") {
+            $tasks = [];
+            $stmt = $conn->prepare("SELECT id, student, (SELECT name FROM students WHERE students.id = student), teacher, (SELECT name FROM teachers WHERE teachers.id = teacher), created, due, started, completed, activity, remarks FROM tasks WHERE student IN (SELECT student FROM class_students WHERE class = ?);");
+            $classId = $schoolClass->getId();
+            $stmt->bind_param("i", $classId);
+            $stmt->execute();
+            $stmt->bind_result($taskId, $taskStudent, $taskStudentName, $taskTeacher, $taskTeacherName, $taskCreated, $taskDue, $taskStarted, $taskCompleted, $taskActivity, $taskRemarks);
+            while($stmt->fetch()) {
+                $tasks[] = ["id" => $taskId, "student" => ["id" => $taskStudent, "name" => $taskStudentName], "teacher" => ["id" => $taskTeacher, "name" => $taskTeacherName], "created" => $taskCreated, "due" => $taskDue, "started" => $taskStarted, "completed" => $taskCompleted, "activity" => $taskActivity, "remarks" => $taskRemarks];
+            }
+            $stmt->close();
+            die(json_encode($tasks));
+        }
         if($request["type"] != "PUT" && $request["type"] != "DELETE") renderError("Unable to route request", 405);
-        validate([$request["sliced"][3] => "string", $request["input"]["id"] => "int"]);
+        validate([$request["sliced"][3] => "string", $request["sliced"][4] => "int"]);
 
         if($request["type"] == "PUT") {
             if($request["sliced"][3] == "student") {
                 $members = $schoolClass->getStudents($conn);
-                foreach($members as $member) if($member["id"] == $request["input"]["id"]) renderError("Student is already in class");
-                $schoolClass->addStudent($conn, $request["input"]["id"]);
+                foreach($members as $member) if($member->getId() == $request["sliced"][4]) renderError("Student is already in class");
+                $schoolClass->addStudent($conn, $request["sliced"][4]);
                 die("{}");
             }
             if($request["sliced"][3] == "teacher") {
                 $members = $schoolClass->getTeachers($conn);
-                foreach($members as $member) if($member["id"] == $request["input"]["id"]) renderError("Teacher is already in class");
-                $schoolClass->addTeacher($conn, $request["input"]["id"]);
+                foreach($members as $member) if($member->getId() == $request["sliced"][4]) renderError("Teacher is already in class");
+                $schoolClass->addTeacher($conn, $request["sliced"][4]);
                 die("{}");
             }
         }
         if($request["type"] == "DELETE") {
             if($request["sliced"][3] == "student") {
                 $members = $schoolClass->getStudents($conn);
-                foreach($members as $member) if($member["id"] == $request["input"]["id"]) {
-                    $schoolClass->deleteStudent($conn, $request["input"]["id"]);
+                foreach($members as $member) if($member->getId() == $request["sliced"][4]) {
+                    $schoolClass->deleteStudent($conn, $request["sliced"][4]);
                     die("{}");
                 }
                 renderError("Nothing to delete");
             }
             if($request["sliced"][3] == "teacher") {
                 $members = $schoolClass->getTeachers($conn);
-                foreach($members as $member) if($member["id"] == $request["input"]["id"]) {
-                    $schoolClass->deleteTeacher($conn, $request["input"]["id"]);
+                foreach($members as $member) if($member->getId() == $request["sliced"][4]) {
+                    $schoolClass->deleteTeacher($conn, $request["sliced"][4]);
                     die("{}");
                 }
                 renderError("Nothing to delete");

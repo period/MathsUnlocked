@@ -74,16 +74,17 @@
                     $snapshotData = str_replace("[[PLACEHOLDER_" .$placeholder["name"]."]]", $placeholder["value"], $snapshotData);
                 }
                 // Decode and compute answer such that we only do this once
-                $snapshot = json_decode($snapshotData)
-                $snapshot["answer"]["value"] = eval($snapshot["answer"]["expression"]);
+                $snapshot = json_decode($snapshotData, true);
+                $snapshot["answer"]["value"] = eval("return " .$snapshot["answer"]["expression"].";");
                 // JSON representation of question is now complete with placeholders generated and replaced, insert into the task's questions
-                $this->addQuestion($conn, json_encode($snapshot));
+                $this->addQuestion(json_encode($snapshot));
 
             }
             $stmt->close();
         }
 
-        public function addQuestion($conn, $data) {
+        public function addQuestion($data) {
+            require("/var/www/mathsunlocked/api/database.php");
             $stmt = $conn->prepare("INSERT INTO task_questions VALUES (null, ?, ?, 0);");
             $stmt->bind_param("is", $this->id, $data);
             $stmt->execute();
@@ -96,7 +97,7 @@
             $stmt->execute();
             $stmt->bind_result($questionId, $questionData, $questionCorrect);
             while($stmt->fetch()) {
-                $questions[] = new TaskQuestion($questionId, ["data" => $questionData, "correct" => $questionCorrect)]);
+                $questions[] = new TaskQuestion($questionId, ["data" => $questionData, "correct" => $questionCorrect]);
             }
             return $questions;
         }

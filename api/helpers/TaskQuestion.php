@@ -5,6 +5,13 @@
         private $data = null;
         private $correct = 0;
 
+        public function __construct($id, $data=array()) {
+            $this->id = $id;
+            foreach($data as $key => $value) {
+            $this->$key = $value;
+            }
+        }
+
         public function load($conn) {
             $stmt = $conn->prepare("SELECT task, data, correct FROM task_questions WHERE id = ?;");
             $stmt->bind_param("i", $this->id);
@@ -27,6 +34,10 @@
             return $this->getData()["answer"]["value"] == $answer;
         }
 
+        public function export() {
+            return ["id" => $this->getId(), "data" => $this->getData()];
+        }
+
         public function getId() {
             return $this->id;
         }
@@ -34,7 +45,7 @@
             return $this->task;
         }
         public function getData() {
-            return json_decode($this->data, true);)
+            return json_decode($this->data, true);
         }
         public function getDataRaw() {
             return $this->data;
