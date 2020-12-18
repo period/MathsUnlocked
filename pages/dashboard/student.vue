@@ -23,13 +23,17 @@
             </b-card>
             <br>
             <b-card title="Activities">
-                <available-activity-list v-on:activity="createTaskFromActivity" />
+                <div v-if="!disableLiveMaths()">
+                    <available-activity-list v-on:activity="createTaskFromActivity" />
+                </div>
+                <div v-else>
+                    <p class="text-danger">You cannot start new activities until you complete the tasks assigned by your teacher.</p>
+                </div>
             </b-card>
         </b-col>
         <b-col lg="3">
             <n-link to="./tasks"><b-button squared block>Task List</b-button></n-link>
             <n-link to="./edit-profile"><b-button squared block>Edit Profile</b-button></n-link>
-            <b-button squared block :disabled="disableLiveMaths()">Live Maths</b-button>
         </b-col>
     </b-row>
   </div>
