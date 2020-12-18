@@ -29,7 +29,7 @@
                 <div class="mt-3">
                     <b-btn-group>
                         <b-button variant="primary" :disabled="this.name.length > 1 && this.name.length < 32" @click="create()">Create classes</b-button>
-                        <b-button variant="secondary" @click="$nuxt.$router.push('/setup/done')">Next Step</b-button>
+                        <b-button variant="secondary" @click="$nuxt.$router.push('/')">Next Step</b-button>
                     </b-btn-group>
                 </div>
             </b-card-body>

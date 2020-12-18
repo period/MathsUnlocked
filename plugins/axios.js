@@ -3,7 +3,6 @@ export default function({ $axios, redirect }) {
         return response;
     }, function (error) {
         if(error.response.status == 429) return $nuxt.$toastr('error', "Too many requests - try again in a few minutes", "Error");
-        alert(error.response.data.message);
         $nuxt.$toastr('error', error.response.data.message, "Error");
         if(error.response.status == 403 || error.response.status == 401) {
             localStorage.setItem('authorization', '')
